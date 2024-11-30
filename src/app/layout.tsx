@@ -18,7 +18,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${GeistSans.variable} h-full`}>
-      <body className="flex h-full flex-col">
+      <body className="flex h-full flex-col overflow-hidden">
         <MapProvider>
           <ThemeProvider defaultTheme="system" storageKey="app-theme">
             <TRPCReactProvider>{children}</TRPCReactProvider>

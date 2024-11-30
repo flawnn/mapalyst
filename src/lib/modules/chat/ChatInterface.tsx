@@ -34,71 +34,75 @@ export const ChatInterface: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const message = inputValue.trim();
-    if (!message) return;
+    if (!message || isLoading) return;
     
     setInputValue("");
     await sendMessage(message);
   };
 
   return (
-    <Card className="flex h-full flex-col">
-      <CardHeader>
+    <Card className="flex h-full flex-col overflow-hidden">
+      <CardHeader className="flex-shrink-0 pb-4">
         <CardTitle className="text-2xl">Chat</CardTitle>
       </CardHeader>
-      <CardContent className="flex flex-1 flex-col gap-4">
-        <ChatMessageList ref={messageListRef} className="flex-1">
-          {messages.map((message) => (
-            <ChatBubble
-              key={message.id}
-              variant={message.sender === "user" ? "sent" : "received"}
-            >
-              {message.sender === "user" ? (
-                <div className="flex-shrink-0 size-8 overflow-hidden rounded-full">
-                  <Avatar
-                    size={32}
-                    name="W"
-                    variant="marble"
-                    colors={[
-                      "#92A1C6",
-                      "#146A7C",
-                      "#F0AB3D",
-                      "#C271B4",
-                      "#C20D90",
-                    ]}
-                  />
-                </div>
-              ) : (
+      <CardContent className="flex flex-1 flex-col gap-4 overflow-hidden p-0">
+        <div className="flex-1 overflow-hidden px-4">
+          <ChatMessageList ref={messageListRef} className="h-full overflow-y-auto">
+            {messages.map((message) => (
+              <ChatBubble
+                key={message.id}
+                variant={message.sender === "user" ? "sent" : "received"}
+              >
+                {message.sender === "user" ? (
+                  <div className="flex-shrink-0 size-8 overflow-hidden rounded-full">
+                    <Avatar
+                      size={32}
+                      name="W"
+                      variant="marble"
+                      colors={[
+                        "#92A1C6",
+                        "#146A7C",
+                        "#F0AB3D",
+                        "#C271B4",
+                        "#C20D90",
+                      ]}
+                    />
+                  </div>
+                ) : (
+                  <ChatBubbleAvatar fallback={chatConfig.bot.fallback}>
+                    {chatConfig.bot.avatar}
+                  </ChatBubbleAvatar>
+                )}
+                <ChatBubbleMessage className="text-sm font-light">
+                  {message.content}
+                </ChatBubbleMessage>
+              </ChatBubble>
+            ))}
+            {isLoading && (
+              <ChatBubble variant="received">
                 <ChatBubbleAvatar fallback={chatConfig.bot.fallback}>
                   {chatConfig.bot.avatar}
                 </ChatBubbleAvatar>
-              )}
-              <ChatBubbleMessage className="text-sm font-light">
-                {message.content}
-              </ChatBubbleMessage>
-            </ChatBubble>
-          ))}
-          {isLoading && (
-            <ChatBubble variant="received">
-              <ChatBubbleAvatar fallback={chatConfig.bot.fallback}>
-                {chatConfig.bot.avatar}
-              </ChatBubbleAvatar>
-              <ChatBubbleMessage isLoading />
-            </ChatBubble>
-          )}
-        </ChatMessageList>
+                <ChatBubbleMessage isLoading />
+              </ChatBubble>
+            )}
+          </ChatMessageList>
+        </div>
 
-        <div className="bg-background focus-within:ring-ring relative flex rounded-lg border focus-within:ring-1">
+        <div className="m-1 bg-background focus-within:ring-ring relative flex rounded-lg border focus-within:ring-1">
           <ChatInput
             value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
+            onChange={(e) => !isLoading && setInputValue(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
+              if (e.key === "Enter" && !e.shiftKey && !isLoading) {
                 e.preventDefault();
                 void handleSubmit(e);
               }
             }}
-            placeholder="Type your message here..."
-            className="bg-background min-h-12 flex-1 resize-none rounded-l-lg border-0 p-3 shadow-none focus-visible:ring-0"
+            placeholder={isLoading ? "Please wait..." : "Type your message here..."}
+            className="bg-background min-h-12 flex-1 resize-none rounded-l-lg border-0 p-3 shadow-none focus-visible:ring-0 disabled:opacity-50"
+            disabled={isLoading}
+            aria-disabled={isLoading}
           />
           <div className="flex items-center p-2">
             <Button
