@@ -1,5 +1,6 @@
 import { nanoid } from "nanoid";
 import { useCallback, useRef, useState } from "react";
+import { evaluateQuery } from "~/lib/vercel-ai/client";
 import { useMap } from "../map/context/MapContext";
 
 export interface ChatMessage {
@@ -51,20 +52,36 @@ export function useChat(options?: UseChatOptions) {
       const userMessage = addMessage({
         content,
         sender: "user",
-        status: "sent",
+        status: "sending",
       });
 
       setIsLoading(true);
 
       try {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        const response = await evaluateQuery(content);
+
+        const responseText = response.error
+          ? `Error: ${response.error}`
+          : `Found location: ${response.coordinates} (Type: ${response.type}${response.radius ? `, Radius: ${response.radius}m` : ""})`;
 
         addMessage({
-          content: "Zooming to EPFL, Lausanne...",
+          content: responseText,
           sender: "bot",
         });
 
-        zoomTo([6.561171, 46.518437], 12);
+        if (!response.error && response.coordinates) {
+          const [lat, lon] = response.coordinates.split(",").map(Number);
+          zoomTo(
+            [lon!, lat!],
+            response.radius ? Math.log2(40000 / response.radius) : 12,
+          );
+        }
+
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === userMessage.id ? { ...msg, status: "sent" } : msg,
+          ),
+        );
       } catch (error) {
         options?.onError?.(error as Error);
         setMessages((prev) =>
