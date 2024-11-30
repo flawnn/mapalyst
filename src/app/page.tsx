@@ -7,7 +7,7 @@ export default function Home() {
     <div className="flex h-full flex-col bg-background">
       <Navbar />
       <main className="flex flex-1 p-6">
-        <div className="container mx-auto">
+        <div className="w-full">
           <div className="grid h-full grid-cols-1 gap-6 md:grid-cols-2">
             <MapInterface />
             <ChatInterface />

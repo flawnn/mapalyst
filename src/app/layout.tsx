@@ -1,5 +1,6 @@
 import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
+import { ThemeProvider } from "~/lib/providers/theme-provider";
 import "~/styles/globals.css";
 
 import { TRPCReactProvider } from "~/trpc/react";
@@ -16,7 +17,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${GeistSans.variable} h-full`}>
       <body className="flex h-full flex-col">
-        <TRPCReactProvider>{children}</TRPCReactProvider>
+        <ThemeProvider defaultTheme="system" storageKey="app-theme">
+          <TRPCReactProvider>{children}</TRPCReactProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
