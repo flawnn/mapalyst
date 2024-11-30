@@ -1,24 +1,13 @@
-import Link from 'next/link'
-import { Button } from "~/ui/components/button"
+import Link from "next/link";
 
 export function Navbar() {
   return (
-    <nav className="bg-primary text-primary-foreground rounded-lg p-4 mb-6">
-      <div className="container mx-auto flex justify-between items-center">
+    <nav className="bg-primary text-primary-foreground mb-6 rounded-lg p-4">
+      <div className="container flex items-center justify-between">
         <Link href="/" className="text-2xl font-bold">
-          Mapalytics
+          mapalytics
         </Link>
-        <div className="space-x-4">
-          <Button variant="ghost" asChild>
-            <Link href="/about">About</Link>
-          </Button>
-          <Button variant="ghost" asChild>
-            <Link href="/contact">Contact</Link>
-          </Button>
-          <Button variant="secondary">Login</Button>
-        </div>
       </div>
     </nav>
-  )
+  );
 }
-
