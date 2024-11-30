@@ -7,7 +7,7 @@ import MessageLoading from "./message-loading";
 
 // ChatBubble
 const chatBubbleVariant = cva(
-  "flex gap-2 max-w-[60%] items-end relative group",
+  "flex gap-3 max-w-[60%] relative group items-start",
   {
     variants: {
       variant: {
@@ -68,7 +68,7 @@ const ChatBubbleAvatar: React.FC<ChatBubbleAvatarProps> = ({
   className,
   children,
 }) => (
-  <Avatar className={className}>
+  <Avatar className={cn("flex-shrink-0", className)}>
     <div className="bg-secondary flex h-full w-full items-center justify-center">
       {children}
     </div>
@@ -114,7 +114,7 @@ const ChatBubbleMessage = React.forwardRef<
     <div
       className={cn(
         chatBubbleMessageVariants({ variant, layout, className }),
-        "max-w-full whitespace-pre-wrap break-words",
+        "max-w-full min-w-0 whitespace-pre-wrap break-words flex-1",
       )}
       ref={ref}
       {...props}

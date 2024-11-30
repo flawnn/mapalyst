@@ -53,7 +53,7 @@ export const ChatInterface: React.FC = () => {
               variant={message.sender === "user" ? "sent" : "received"}
             >
               {message.sender === "user" ? (
-                <div className="size-8 overflow-hidden rounded-full">
+                <div className="flex-shrink-0 size-8 overflow-hidden rounded-full">
                   <Avatar
                     size={32}
                     name="W"
