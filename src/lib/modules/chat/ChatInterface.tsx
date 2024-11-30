@@ -33,16 +33,17 @@ export const ChatInterface: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputValue.trim()) return;
-
-    await sendMessage(inputValue);
+    const message = inputValue.trim();
+    if (!message) return;
+    
     setInputValue("");
+    await sendMessage(message);
   };
 
   return (
     <Card className="flex h-full flex-col">
       <CardHeader>
-        <CardTitle className="text-2xl">Chat Interface</CardTitle>
+        <CardTitle className="text-2xl">Chat</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-1 flex-col gap-4">
         <ChatMessageList ref={messageListRef} className="flex-1">

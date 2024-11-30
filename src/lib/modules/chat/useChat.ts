@@ -1,5 +1,6 @@
 import { nanoid } from "nanoid";
 import { useCallback, useRef, useState } from "react";
+import { useMap } from "../map/context/MapContext";
 
 export interface ChatMessage {
   id: string;
@@ -15,6 +16,7 @@ interface UseChatOptions {
 }
 
 export function useChat(options?: UseChatOptions) {
+  const { zoomTo } = useMap();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const messageListRef = useRef<HTMLDivElement>(null);
@@ -58,9 +60,11 @@ export function useChat(options?: UseChatOptions) {
         await new Promise((resolve) => setTimeout(resolve, 1000));
 
         addMessage({
-          content: "This is a simulated response.",
+          content: "Zooming to EPFL, Lausanne...",
           sender: "bot",
         });
+
+        zoomTo([6.561171, 46.518437], 12);
       } catch (error) {
         options?.onError?.(error as Error);
         setMessages((prev) =>
@@ -72,7 +76,7 @@ export function useChat(options?: UseChatOptions) {
         setIsLoading(false);
       }
     },
-    [addMessage, options],
+    [addMessage, options, zoomTo],
   );
 
   return {
