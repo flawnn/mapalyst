@@ -1,5 +1,6 @@
 import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
+import { MapProvider } from "~/lib/modules/map/context/MapContext";
 import { ThemeProvider } from "~/lib/providers/theme-provider";
 import "~/styles/globals.css";
 
@@ -18,10 +19,12 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${GeistSans.variable} h-full`}>
       <body className="flex h-full flex-col">
-        <ThemeProvider defaultTheme="system" storageKey="app-theme">
-          <TRPCReactProvider>{children}</TRPCReactProvider>
-        </ThemeProvider>
-        <Toaster />
+        <MapProvider>
+          <ThemeProvider defaultTheme="system" storageKey="app-theme">
+            <TRPCReactProvider>{children}</TRPCReactProvider>
+          </ThemeProvider>
+          <Toaster />
+        </MapProvider>
       </body>
     </html>
   );
