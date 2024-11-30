@@ -4,6 +4,7 @@ import { ThemeProvider } from "~/lib/providers/theme-provider";
 import "~/styles/globals.css";
 
 import { TRPCReactProvider } from "~/trpc/react";
+import { Toaster } from "~/ui/components/toaster";
 
 export const metadata: Metadata = {
   title: "Mapalytics",
@@ -20,6 +21,7 @@ export default function RootLayout({
         <ThemeProvider defaultTheme="system" storageKey="app-theme">
           <TRPCReactProvider>{children}</TRPCReactProvider>
         </ThemeProvider>
+        <Toaster />
       </body>
     </html>
   );
