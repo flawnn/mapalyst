@@ -39,6 +39,7 @@
     "next": "^15.0.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "recharts": "^2.13.3",
     "server-only": "^0.0.1",
     "superjson": "^2.2.1",
     "tailwind-merge": "^2.5.5",
@@ -62,6 +63,9 @@
   },
   "ct3aMetadata": {
     "initVersion": "7.38.1"
+  },
+  "overrides": {
+    "react-is": "^19.0.0-rc-69d4b800-20241021"
   },
   "packageManager": "pnpm@9.12.1"
 }
