@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 "use client";
 
 import Avatar from "boring-avatars";
 import { CornerDownLeft } from "lucide-react";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useToast } from "~/hooks/use-toast";
 import { Button } from "~/ui/components/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/ui/components/card";
@@ -15,30 +16,30 @@ import { ChatInput } from "~/ui/components/chat/chat-input";
 import { ChatMessageList } from "~/ui/components/chat/chat-message-list";
 import { chatConfig } from "./config/chat-config";
 import { useChat } from "./useChat";
-import { ChatMessage } from "./types";
 
 export const ChatInterface: React.FC = () => {
   const [inputValue, setInputValue] = useState("");
   const { toast } = useToast();
-
-  const { messages, isLoading, sendMessage, messageListRef } = useChat({
-    onError: (error) => {
-      console.error("Failed to send message:", error);
-      toast({
-        title: "Failed to send message",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
+  const { messages, isLoading, sendMessage, messagesEndRef } = useChat();
+  const messageListRef = useRef<HTMLDivElement>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const message = inputValue.trim();
     if (!message || isLoading) return;
-    
-    setInputValue("");
-    await sendMessage(message);
+
+    try {
+      setInputValue("");
+      await sendMessage(message);
+    } catch (error) {
+      console.error("Failed to send message:", error);
+      toast({
+        title: "Failed to send message",
+        description:
+          error instanceof Error ? error.message : "Unknown error occurred",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -48,15 +49,18 @@ export const ChatInterface: React.FC = () => {
       </CardHeader>
       <CardContent className="flex flex-1 flex-col gap-4 overflow-hidden p-0">
         <div className="flex-1 overflow-hidden px-4">
-          <ChatMessageList ref={messageListRef} className="h-full overflow-y-auto">
-            {messages.map((message) => (
+          <ChatMessageList
+            ref={messageListRef}
+            className="h-full overflow-y-auto"
+          >
+            {messages.map((message, index) => (
               <ChatBubble
-                key={message.id}
-                variant={message.sender === "user" ? "sent" : "received"}
-                hasRichContent={message.type !== "text"}
+                key={index}
+                variant={message.role === "user" ? "sent" : "received"}
+                hasRichContent={!!message.widget}
               >
-                {message.sender === "user" ? (
-                  <div className="flex-shrink-0 size-8 overflow-hidden rounded-full">
+                {message.role === "user" ? (
+                  <div className="size-8 flex-shrink-0 overflow-hidden rounded-full">
                     <Avatar
                       size={32}
                       name="W"
@@ -76,11 +80,7 @@ export const ChatInterface: React.FC = () => {
                   </ChatBubbleAvatar>
                 )}
                 <ChatBubbleMessage className="text-sm font-light">
-                  {message.type === "text" ? (
-                    message.content
-                  ) : (
-                    message.widget
-                  )}
+                  {message.widget ? message.widget : message.content}
                 </ChatBubbleMessage>
               </ChatBubble>
             ))}
@@ -92,10 +92,11 @@ export const ChatInterface: React.FC = () => {
                 <ChatBubbleMessage isLoading />
               </ChatBubble>
             )}
+            <div ref={messagesEndRef} style={{ height: 1 }} />
           </ChatMessageList>
         </div>
 
-        <div className="m-1 bg-background focus-within:ring-ring relative flex rounded-lg border focus-within:ring-1">
+        <div className="bg-background focus-within:ring-ring relative m-1 flex rounded-lg border focus-within:ring-1">
           <ChatInput
             value={inputValue}
             onChange={(e) => !isLoading && setInputValue(e.target.value)}
@@ -105,7 +106,9 @@ export const ChatInterface: React.FC = () => {
                 void handleSubmit(e);
               }
             }}
-            placeholder={isLoading ? "Please wait..." : "Type your message here..."}
+            placeholder={
+              isLoading ? "Please wait..." : "Type your message here..."
+            }
             className="bg-background min-h-12 flex-1 resize-none rounded-l-lg border-0 p-3 shadow-none focus-visible:ring-0 disabled:opacity-50"
             disabled={isLoading}
             aria-disabled={isLoading}
