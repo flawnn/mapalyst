@@ -8,7 +8,7 @@ import {
   type TextMessage,
   type WidgetMessage,
 } from "./types";
-import { ResponseWidget } from "./widgets/RichResponseWidget";
+import { RichResponseWidget } from "./widgets/RichResponseWidget";
 
 interface UseChatOptions {
   onNewMessage?: (message: ChatMessage) => void;
@@ -81,8 +81,22 @@ export function useChat(options?: UseChatOptions) {
           : `Found location: ${response.coordinates} (Type: ${response.type}${response.radius ? `, Radius: ${response.radius}m` : ""})`;
 
         addWidgetMessage(
-          <ResponseWidget
+          <RichResponseWidget
             images={["/test-image.png", "/test-image.png", "/test-image.png"]}
+            timeSeriesData={[
+              { timestamp: new Date('2023-01-01').getTime(), value: 10 },
+              { timestamp: new Date('2023-02-01').getTime(), value: 15 },
+              { timestamp: new Date('2023-03-01').getTime(), value: 12 },
+              { timestamp: new Date('2023-04-01').getTime(), value: 18 },
+              { timestamp: new Date('2023-05-01').getTime(), value: 14 },
+              { timestamp: new Date('2023-06-01').getTime(), value: 16 },
+              { timestamp: new Date('2023-07-01').getTime(), value: 20 },
+              { timestamp: new Date('2023-08-01').getTime(), value: 22 },
+              { timestamp: new Date('2023-09-01').getTime(), value: 19 },
+              { timestamp: new Date('2023-10-01').getTime(), value: 25 },
+              { timestamp: new Date('2023-11-01').getTime(), value: 23 },
+              { timestamp: new Date('2023-12-01').getTime(), value: 28 },
+            ]}
             content={responseText}
           />,
         );

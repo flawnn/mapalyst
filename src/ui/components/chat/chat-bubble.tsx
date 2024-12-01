@@ -7,48 +7,42 @@ import MessageLoading from "./message-loading";
 
 // ChatBubble
 const chatBubbleVariant = cva(
-  "flex gap-3 max-w-[60%] relative group items-start",
+  "flex gap-3 relative group items-start",
   {
     variants: {
       variant: {
-        received: "self-start",
-        sent: "self-end flex-row-reverse",
+        received: "self-start max-w-[80%]",
+        sent: "self-end flex-row-reverse max-w-[80%]",
       },
-      layout: {
-        default: "",
-        ai: "max-w-full w-full items-center",
-      },
+      hasRichContent: {
+        true: "max-w-fit",
+        false: "",
+      }
     },
     defaultVariants: {
       variant: "received",
-      layout: "default",
+      hasRichContent: false,
     },
   },
 );
 
 interface ChatBubbleProps
   extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof chatBubbleVariant> {}
+    VariantProps<typeof chatBubbleVariant> {
+  hasRichContent?: boolean;
+}
 
 const ChatBubble = React.forwardRef<HTMLDivElement, ChatBubbleProps>(
-  ({ className, variant, layout, children, ...props }, ref) => (
+  ({ className, variant, hasRichContent, children, ...props }, ref) => (
     <div
       className={cn(
-        chatBubbleVariant({ variant, layout, className }),
-        "group relative",
+        chatBubbleVariant({ variant, hasRichContent, className }),
+        "group relative"
       )}
       ref={ref}
       {...props}
     >
-      {React.Children.map(children, (child) =>
-        React.isValidElement(child) && typeof child.type !== "string"
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-          ? React.cloneElement(child, {
-              variant,
-              layout,
-            } as React.ComponentProps<typeof child.type>)
-          : child,
-      )}
+      {children}
     </div>
   ),
 );
@@ -79,23 +73,26 @@ const ChatBubbleAvatar: React.FC<ChatBubbleAvatarProps> = ({
 );
 
 // ChatBubbleMessage
-const chatBubbleMessageVariants = cva("p-4 font-geist text-[14px] leading-relaxed", {
-  variants: {
-    variant: {
-      received:
-        "bg-secondary text-secondary-foreground rounded-r-lg rounded-tl-lg",
-      sent: "bg-primary text-primary-foreground rounded-l-lg rounded-tr-lg",
+const chatBubbleMessageVariants = cva(
+  "p-4 font-geist text-[14px] leading-relaxed overflow-hidden",
+  {
+    variants: {
+      variant: {
+        received:
+          "bg-secondary text-secondary-foreground rounded-r-lg rounded-tl-lg",
+        sent: "bg-primary text-primary-foreground rounded-l-lg rounded-tr-lg",
+      },
+      layout: {
+        default: "",
+        ai: "border-t w-full rounded-none bg-transparent",
+      },
     },
-    layout: {
-      default: "",
-      ai: "border-t w-full rounded-none bg-transparent",
+    defaultVariants: {
+      variant: "received",
+      layout: "default",
     },
   },
-  defaultVariants: {
-    variant: "received",
-    layout: "default",
-  },
-});
+);
 
 interface ChatBubbleMessageProps
   extends React.HTMLAttributes<HTMLDivElement>,

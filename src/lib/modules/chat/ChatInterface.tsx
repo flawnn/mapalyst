@@ -53,6 +53,7 @@ export const ChatInterface: React.FC = () => {
               <ChatBubble
                 key={message.id}
                 variant={message.sender === "user" ? "sent" : "received"}
+                hasRichContent={message.type !== "text"}
               >
                 {message.sender === "user" ? (
                   <div className="flex-shrink-0 size-8 overflow-hidden rounded-full">

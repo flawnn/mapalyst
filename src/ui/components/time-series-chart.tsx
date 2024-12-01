@@ -1,16 +1,38 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 "use client";
 
-import React from "react";
 import {
-  ResponsiveContainer,
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
+  CategoryScale,
+  Chart as ChartJS,
+  Legend,
+  LinearScale,
+  LineElement,
+  PointElement,
+  TimeScale,
+  Title,
   Tooltip,
-  CartesianGrid,
-} from "recharts";
+  type ChartData,
+  type ChartOptions,
+  type ScaleOptionsByType,
+} from "chart.js";
+import "chartjs-adapter-date-fns";
+import { enUS } from "date-fns/locale";
+import React from "react";
+import { Line } from "react-chartjs-2";
 import { cn } from "~/lib/utils";
+
+// Register Chart.js components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  TimeScale,
+);
 
 export interface DataPoint {
   timestamp: number;
@@ -23,6 +45,7 @@ interface TimeSeriesChartProps {
   height?: number;
   color?: string;
   onPointHover?: (point: DataPoint | null) => void;
+  timeUnit?: "day" | "month";
 }
 
 export const TimeSeriesChart: React.FC<TimeSeriesChartProps> = ({
@@ -31,49 +54,115 @@ export const TimeSeriesChart: React.FC<TimeSeriesChartProps> = ({
   height = 200,
   color = "#8884d8",
   onPointHover,
+  timeUnit = "day",
 }) => {
-  const formatXAxis = (timestamp: number) => {
-    return new Date(timestamp).toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+  const containerRef = React.useRef<HTMLDivElement>(null);
+
+  const chartData: ChartData<"line"> = {
+    datasets: [
+      {
+        label: "Value",
+        data: data.map((point) => ({
+          x: point.timestamp,
+          y: point.value,
+        })),
+        borderColor: color,
+        backgroundColor: color,
+        pointRadius: 4,
+        pointHoverRadius: 6,
+        borderWidth: 2,
+        tension: 0.4,
+      },
+    ],
+  };
+
+  const options: ChartOptions<"line"> = {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: {
+      intersect: true,
+      mode: "index",
+    },
+    plugins: {
+      legend: {
+        display: false,
+      },
+      tooltip: {
+        enabled: true,
+        callbacks: {
+          title: (context) => {
+            const point = data[context[0].dataIndex];
+            if (point) {
+              return new Date(point.timestamp).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+              });
+            }
+            return "";
+          },
+          label: (context) => {
+            const point = data[context.dataIndex];
+            if (point) {
+              onPointHover?.(point);
+            }
+            return ` Value: ${context.formattedValue}`;
+          },
+        },
+      },
+    },
+    scales: {
+      x: {
+        type: "time",
+        time: {
+          unit: timeUnit,
+          displayFormats: {
+            day: "MMM yyyy",
+            month: "MMM yyyy",
+          },
+        },
+        adapters: {
+          date: {
+            locale: enUS,
+          },
+        },
+        grid: {
+          display: false,
+        },
+        ticks: {
+          maxRotation: 0,
+          autoSkip: false,
+          callback: function(value, index) {
+            return index % 3 === 0 ? new Date(value).toLocaleDateString("en-US", {
+              month: "short",
+              year: "numeric"
+            }) : "";
+          },
+          font: {
+            size: 11,
+          },
+        },
+      } as unknown as ScaleOptionsByType<"time">,
+      y: {
+        beginAtZero: true,
+        grid: {
+          display: false,
+        },
+      },
+    },
+    onHover: (_event, _elements, chart) => {
+      if (_elements.length === 0) {
+        onPointHover?.(null);
+      }
+    },
   };
 
   return (
-    <div className={cn("w-full", className)}>
-      <ResponsiveContainer width="100%" height={height}>
-        <LineChart
-          data={data}
-          margin={{ top: 10, right: 10, left: 10, bottom: 10 }}
-          onMouseLeave={() => onPointHover?.(null)}
-        >
-          <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-          <XAxis
-            dataKey="timestamp"
-            tickFormatter={formatXAxis}
-            type="number"
-            domain={["dataMin", "dataMax"]}
-          />
-          <YAxis />
-          <Tooltip
-            formatter={(value: number) => [value, "Value"]}
-            labelFormatter={(label: number) => new Date(label).toLocaleString()}
-            onMouseEnter={(data) => {
-              if (data.activePayload) {
-                onPointHover?.(data.activePayload[0].payload as DataPoint);
-              }
-            }}
-          />
-          <Line
-            type="monotone"
-            dataKey="value"
-            stroke={color}
-            dot={{ r: 4 }}
-            activeDot={{ r: 6 }}
-            strokeWidth={2}
-          />
-        </LineChart>
-      </ResponsiveContainer>
+    <div
+      ref={containerRef}
+      className={cn("w-full", className)}
+      style={{ height }}
+    >
+      <Line data={chartData} options={options} />
     </div>
   );
-}; 
+};
