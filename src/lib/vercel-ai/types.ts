@@ -24,5 +24,7 @@ export type LocationQuery = z.infer<typeof LocationQuerySchema>;
 export const KEY_PLACES = {
   "EPFL": "46.518437,6.561171",
   "ETH Zurich": "47.376440,8.548157",
+  "JFK Airport": "40.6413,-73.7809",
+  "Chrysler car factory in Detroit": "42.379616, -82.969175",
   // Add more key places as needed
-} as const; 
+} as const;

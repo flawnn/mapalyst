@@ -52,7 +52,7 @@ export function useChat() {
   const synthesizeFindingsMutation = api.satellite.synthesizeFindings.useMutation();
 
   // Enhanced scroll to bottom function
-  const scrollToBottom = useCallback((delay: number = SCROLL_DELAY, immediate: boolean = false) => {
+  const scrollToBottom = useCallback((delay: number = SCROLL_DELAY, immediate = false) => {
     // Clear any existing scroll timeout
     if (scrollTimeoutRef.current) {
       clearTimeout(scrollTimeoutRef.current);
