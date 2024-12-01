@@ -54,7 +54,7 @@ export const TimeSeriesChart: React.FC<TimeSeriesChartProps> = ({
   height = 200,
   color = "#8884d8",
   onPointHover,
-  timeUnit = "day",
+  timeUnit = "month",
 }) => {
   const containerRef = React.useRef<HTMLDivElement>(null);
 
@@ -116,7 +116,6 @@ export const TimeSeriesChart: React.FC<TimeSeriesChartProps> = ({
         time: {
           unit: timeUnit,
           displayFormats: {
-            day: "MMM yyyy",
             month: "MMM yyyy",
           },
         },
@@ -129,13 +128,29 @@ export const TimeSeriesChart: React.FC<TimeSeriesChartProps> = ({
           display: false,
         },
         ticks: {
+          source: 'data',
           maxRotation: 0,
           autoSkip: false,
-          callback: function(value, index) {
-            return index % 3 === 0 ? new Date(value).toLocaleDateString("en-US", {
-              month: "short",
-              year: "numeric"
-            }) : "";
+          callback: function(value: number | string, index: number): string | null {
+            if (typeof value !== 'number') return null;
+            
+            const date = new Date(value);
+            
+            if (index === 0 || index === data.length - 1) {
+              return date.toLocaleDateString("en-US", {
+                month: "short",
+                year: "numeric",
+              });
+            }
+            
+            if (index % 4 === 0) {
+              return date.toLocaleDateString("en-US", {
+                month: "short",
+                year: "numeric",
+              });
+            }
+            
+            return null;
           },
           font: {
             size: 11,

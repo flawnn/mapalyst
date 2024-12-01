@@ -94,8 +94,8 @@ export const RichResponseWidget: React.FC<RichResponseWidgetProps> = ({
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious className="absolute left-2 top-1/2 -translate-y-1/2 bg-background/80 hover:bg-background/90" />
-            <CarouselNext className="absolute right-2 top-1/2 -translate-y-1/2 bg-background/80 hover:bg-background/90" />
+            <CarouselPrevious className="absolute left-3 top-1/2 -translate-y-1/2 bg-background/80 hover:bg-background/90" />
+            <CarouselNext className="absolute right-3 top-1/2 -translate-y-1/2 bg-background/80 hover:bg-background/90" />
           </Carousel>
         </div>
 
