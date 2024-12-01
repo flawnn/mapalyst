@@ -15,6 +15,7 @@ import { ChatInput } from "~/ui/components/chat/chat-input";
 import { ChatMessageList } from "~/ui/components/chat/chat-message-list";
 import { chatConfig } from "./config/chat-config";
 import { useChat } from "./useChat";
+import { ChatMessage } from "./types";
 
 export const ChatInterface: React.FC = () => {
   const [inputValue, setInputValue] = useState("");
@@ -74,7 +75,11 @@ export const ChatInterface: React.FC = () => {
                   </ChatBubbleAvatar>
                 )}
                 <ChatBubbleMessage className="text-sm font-light">
-                  {message.content}
+                  {message.type === "text" ? (
+                    message.content
+                  ) : (
+                    message.widget
+                  )}
                 </ChatBubbleMessage>
               </ChatBubble>
             ))}

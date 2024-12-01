@@ -2,14 +2,13 @@ import { nanoid } from "nanoid";
 import { useCallback, useRef, useState } from "react";
 import { evaluateQuery } from "~/lib/vercel-ai/client";
 import { useMap } from "../map/context/MapContext";
-
-export interface ChatMessage {
-  id: string;
-  content: string;
-  sender: "user" | "bot";
-  timestamp: Date;
-  status?: "sending" | "sent" | "error";
-}
+import {
+  type ChatMessage,
+  type MessageSender,
+  type TextMessage,
+  type WidgetMessage,
+} from "./types";
+import { ResponseWidget } from "./widgets/RichResponseWidget";
 
 interface UseChatOptions {
   onNewMessage?: (message: ChatMessage) => void;
@@ -28,12 +27,29 @@ export function useChat(options?: UseChatOptions) {
     }
   }, []);
 
+  const addWidgetMessage = useCallback(
+    (widget: React.ReactNode) => {
+      const newMessage: WidgetMessage = {
+        id: nanoid(),
+        sender: "assistant",
+        type: "widget",
+        widget,
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, newMessage]);
+      options?.onNewMessage?.(newMessage);
+      setTimeout(scrollToBottom, 100);
+    },
+    [options, scrollToBottom],
+  );
+
   const addMessage = useCallback(
-    (message: Omit<ChatMessage, "id" | "timestamp">) => {
-      const newMessage: ChatMessage = {
+    (message: { content: string; sender: MessageSender; status?: string }) => {
+      const newMessage: TextMessage = {
         ...message,
         id: nanoid(),
         timestamp: new Date(),
+        type: "text",
       };
 
       setMessages((prev) => [...prev, newMessage]);
@@ -64,10 +80,12 @@ export function useChat(options?: UseChatOptions) {
           ? `Error: ${response.error}`
           : `Found location: ${response.coordinates} (Type: ${response.type}${response.radius ? `, Radius: ${response.radius}m` : ""})`;
 
-        addMessage({
-          content: responseText,
-          sender: "bot",
-        });
+        addWidgetMessage(
+          <ResponseWidget
+            images={["/test-image.png", "/test-image.png", "/test-image.png"]}
+            content={responseText}
+          />,
+        );
 
         if (!response.error && response.coordinates) {
           const [lat, lon] = response.coordinates.split(",").map(Number);
@@ -93,7 +111,7 @@ export function useChat(options?: UseChatOptions) {
         setIsLoading(false);
       }
     },
-    [addMessage, options, zoomTo],
+    [addMessage, addWidgetMessage, options, zoomTo],
   );
 
   return {
@@ -101,5 +119,6 @@ export function useChat(options?: UseChatOptions) {
     isLoading,
     sendMessage,
     messageListRef,
+    addWidgetMessage,
   };
 }
