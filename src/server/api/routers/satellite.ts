@@ -12,6 +12,22 @@ const FindingsSynthesisResponseSchema = z.object({
   confidence: z.number().min(0).max(1),
 });
 
+// Helper function to determine zoom level based on analysis type
+const getZoomLevelForType = (type: string): number => {
+  const lowerType = type.toLowerCase();
+  switch (true) {
+    case lowerType.includes('car'):
+      return 100;
+    // Add more specific cases here as needed
+    case lowerType.includes('building'):
+      return 500;
+    case lowerType.includes('chimney'):
+      return 50;
+    default:
+      return 1000;
+  }
+};
+
 export const satelliteRouter = createTRPCRouter({
   analyzeQuery: publicProcedure
     .input(z.object({ query: z.string() }))
@@ -26,7 +42,7 @@ export const satelliteRouter = createTRPCRouter({
           throw new Error("Invalid coordinates returned from AI");
         }
 
-        const zoom = aiResult.type.toLowerCase().includes("car") ? 100 : 1000;
+        const zoom = getZoomLevelForType(aiResult.type);
 
         const satelliteResult = await satelliteApiClient.downloadSatelliteImages({
           latitude: lat!,

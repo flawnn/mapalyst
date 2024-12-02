@@ -11,7 +11,7 @@ const INITIAL_MAP_STATE = {
   zoom: 1,
 } as const;
 
-const STEP_MINIMUM_DURATION = 500; // ms
+const STEP_MINIMUM_DURATION = 1000; // ms
 const SCROLL_DELAY = 100; // ms
 const CONTENT_UPDATE_DELAY = 150; // ms
 

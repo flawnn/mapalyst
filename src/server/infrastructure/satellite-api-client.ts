@@ -26,8 +26,8 @@ export class SatelliteApiError extends Error {
 
 // API Configuration
 const API_CONFIG = {
-  baseUrl: "https://76ef-185-62-108-226.ngrok-free.app",
-  timeout: 300000, // 30 seconds
+  baseUrl: "https://67a4c3059ca6fc342b8602dbdc7a8a34.serveo.net",
+  timeout: 3000000, // 30 seconds
 } as const;
 
 // Helper function to handle API responses
@@ -70,7 +70,7 @@ export const satelliteApiClient = {
     }).toString();
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.timeout * 1000);
+    const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.timeout);
 
     try {
       const response = await fetch(
@@ -80,6 +80,7 @@ export const satelliteApiClient = {
           headers: {
             "Content-Type": "application/json",
           },
+          keepalive: true,
         },
       );
 
@@ -121,6 +122,7 @@ export const satelliteApiClient = {
           headers: {
             "Content-Type": "application/json",
           },
+          keepalive: true,
         },
       );
 

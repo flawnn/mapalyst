@@ -1,8 +1,8 @@
 import { createOpenAI } from "@ai-sdk/openai";
 import { generateObject } from "ai";
+import { z } from "zod";
 import { AI_CONFIG } from "./config";
 import { KEY_PLACES, LocationQuerySchema, type LocationQuery } from "./types";
-import { z } from "zod";
 
 const openai = createOpenAI({ apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY });
 
@@ -46,11 +46,11 @@ Format your findings as a structured output with:
 export async function synthesizeFindings(
   timeSeriesData: TimeSeriesDataPoint[],
   coordinates: { latitude: number; longitude: number },
-  objectType: string
+  objectType: string,
 ): Promise<FindingsSynthesis> {
   try {
-    const formattedData = timeSeriesData.map(point => ({
-      date: new Date(point.timestamp).toISOString().split('T')[0],
+    const formattedData = timeSeriesData.map((point) => ({
+      date: new Date(point.timestamp).toISOString().split("T")[0],
       value: point.value,
     }));
 
@@ -89,10 +89,11 @@ ${Object.entries(KEY_PLACES)
 
 Rules:
 1. If a user mentions a key place, use its exact coordinates
-2. If a user provides coordinates directly (in any format), convert them to "lat,lon"
-3. The type parameter must be extracted from context
-4. If radius is mentioned (in any unit), convert it to meters
-5. If required parameters are missing or invalid, return an error message
+2. If a user provides coordinates directly  (in any format), convert them to "lat,lon"
+3. If a location is neither a key place nor coordinates, return it if you know it.
+4. The type parameter must be extracted from context
+5. If radius is mentioned (in any unit), convert it to meters
+6. If required parameters are missing or invalid, return an error message
 
 Examples:
 - "Find restaurants near EPFL" -> { "coordinates": "46.518437,6.561171", "type": "restaurant" }

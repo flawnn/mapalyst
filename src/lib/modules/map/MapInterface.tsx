@@ -34,7 +34,7 @@ export const MapInterface: React.FC = () => {
   return (
     <Card className="relative flex h-full flex-col overflow-hidden">
       <div className="absolute left-6 top-6 z-[5]">
-        <div className="bg-background/80 rounded-lg px-4 py-2 shadow-lg backdrop-blur-md">
+        <div className="bg-background/60 rounded-lg px-4 py-2 shadow-lg backdrop-blur-md">
           <h2 className="text-2xl font-semibold">Map</h2>
         </div>
       </div>

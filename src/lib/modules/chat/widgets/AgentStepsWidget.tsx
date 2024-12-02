@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 export const ANALYSIS_STEPS = {
   ANALYZE_QUERY: "Analyze Query",
   GET_SATELLITE_IMAGES: "Get Satellite Images",
-  ANALYZE_OBJECT_TYPE: "Analyze Object Type",
+  ANALYZE_OBJECT_TYPE: "Analyze Object",
   PROCESS_IMAGES: "Process Images",
 } as const;
 
